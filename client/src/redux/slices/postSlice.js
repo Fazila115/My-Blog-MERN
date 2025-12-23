@@ -1,14 +1,15 @@
 import { createSlice } from '@reduxjs/toolkit'
 
 const initialState = {
-    user: null,
+    posts: [],
+    post: null,
     error: null,
     success: null,
     loading: false
 };
 
-const authSlice = createSlice({
-    name: 'auth',
+const postSlice = createSlice({
+    name: 'post',
     initialState,
     reducers: {
         setLoading: (state) => {
@@ -26,8 +27,14 @@ const authSlice = createSlice({
             state.loading = false;
             state.error = null;
         },
-        setUser: (state, { payload }) => {
-            state.user = payload;
+        setPosts: (state, { payload }) => {
+            state.posts = payload || [];
+            state.loading = false;
+            state.error = null;
+            state.success = null;
+        },
+        setPost: (state, { payload }) => {
+            state.post = payload;
             state.loading = false;
             state.error = null;
             state.success = null;
@@ -35,5 +42,5 @@ const authSlice = createSlice({
     }
 });
 
-export default authSlice.reducer;
-export const { setLoading, setSuccess, setUser, setError } = authSlice.actions;
+export default postSlice.reducer;
+export const { setLoading, setSuccess, setPosts, setPost, setError } = postSlice.actions;
