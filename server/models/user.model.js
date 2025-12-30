@@ -10,7 +10,12 @@ const userSchema = new Schema({
     phone: { type: String, required: true, match: [/^03[0-9]{9}$/, "Phone number must be 11 digits and start with 03"], },
     dob: { type: Date, required: true },
     address: { type: String, required: true, minLength: 3, maxLength: 200 },
-    img: { type: String, default: 'default-profile.png' }
+    img: { type: String, default: 'default-profile.png' },
+    isVerified: { type: Boolean, default: false },
+    emailVerifyToken: String,
+    emailVerifyExpiry: Date,
+    resetPasswordToken: String,
+    resetPasswordExpiry: Date
 }, { timestamps: true });
 
 // Hash password before saving
