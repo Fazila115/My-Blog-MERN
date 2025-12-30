@@ -13,7 +13,9 @@ const userSchema = new Schema({
     img: { type: String, default: 'default-profile.png' },
     isVerified: { type: Boolean, default: false },
     emailVerifyToken: String,
-    emailVerifyExpiry: Date
+    emailVerifyExpiry: Date,
+    resetPasswordToken: String,
+    resetPasswordExpiry: Date
 }, { timestamps: true });
 
 // Hash password before saving

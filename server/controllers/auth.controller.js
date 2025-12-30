@@ -17,7 +17,7 @@ validator
     .has().symbols()
     .has().not().spaces()
 
-// 1. pre-signup controller
+// 1. pre-signup controller - POST - verification, email send
 const preSignup = async (req, res) => {
     try {
         const { firstName, lastName, email, password, bio, phone, dob, address } = req.body;
@@ -97,11 +97,11 @@ const preSignup = async (req, res) => {
         res.status(200).json({ ok: true, message: 'Verification email sent. Please check your inbox!' });
     }
     catch (error) {
-        res.status(500).json({ error: error.message, message: 'Server Error' });
+        return res.status(500).json({ error: error.message, message: 'Server Error' });
     }
 };
 
-// 2. signup controller - register new user
+// 2. signup controller - GET - save new user
 const signup = async (req, res) => {
     try {
         const { token } = req.params;
@@ -123,11 +123,11 @@ const signup = async (req, res) => {
         return res.redirect(`${process.env.CLIENT_URL}/login`);
     }
     catch (error) {
-        res.status(500).json({ error: error.message, message: 'Server Error' });
+        return res.status(500).json({ error: error.message, message: 'Server Error' });
     }
 };
 
-// 3.login controller 
+// 3. login controller - POST
 const login = async (req, res) => {
     try {
         const { email, password } = req.body;
@@ -172,8 +172,47 @@ const login = async (req, res) => {
         });
     }
     catch (error) {
-        res.status(500).json({ error: error.message, message: 'Server Error' });
+        return res.status(500).json({ error: error.message, message: 'Server Error' });
     }
 };
 
-export { preSignup, signup, login };
+// 4. forget password controller - POST
+const forgetPassword = async (req, res) => {
+    try {
+        const { email } = req.body;
+
+        if (!email) {
+            return res.status(400).json({ ok: false, message: 'Email is required!' });
+        }
+        if (!emailValidator.validate(email)) {
+            return res.status(400).json({ ok: false, message: 'Invalid email format!' });
+        }
+        const user = await User.findOne({ email: email.toLowerCase() });
+        if (!user) {
+            return res.status(400).json({ ok: false, message: `This email: ${email} is not registered!` });
+        }
+
+        const { token, hashedToken } = generateEmailToken();
+        user.resetPasswordToken = hashedToken;
+        user.resetPasswordExpiry = Date.now() + 60 * 60 * 1000;
+        await user.save();
+
+        const resetUrl = `${process.env.CLIENT_URL}/reset-password/${token}`;
+
+        await emailTemplate({
+            to: email,
+            subject: 'Reset Your Password',
+            html: `
+            <p>Click on the below link to to reset your password: </p> <br/>
+            <a href="${resetUrl}">Reset Password</a>
+            `
+        });
+
+        res.status(200).json({ ok: true, message: 'Password reset email sent!' });
+    }
+    catch (error) {
+        return res.status(500).json({ error: error.message, message: 'Server Error' });
+    }
+}
+
+export { preSignup, signup, login, forgetPassword };
