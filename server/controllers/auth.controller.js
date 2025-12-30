@@ -4,6 +4,8 @@ import passwordValidator from 'password-validator';
 import emailTemplate from '../helper/emailTemplate.js';
 import { generateEmailToken } from '../helper/generateToken.js';
 import crypto from 'crypto';
+import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
 
 var validator = new passwordValidator();
 validator
@@ -64,14 +66,14 @@ const preSignup = async (req, res) => {
         const emailExpiry = Date.now() + 60 * 60 * 1000;
 
         const newUser = new User({
-            firstName, 
-            lastName, 
-            email, 
-            password, 
-            bio, 
-            phone, 
-            dob, 
-            address, 
+            firstName,
+            lastName,
+            email,
+            password,
+            bio,
+            phone,
+            dob,
+            address,
             img,
             emailVerifyToken: hashedToken,
             emailVerifyExpiry: emailExpiry,
@@ -128,10 +130,49 @@ const signup = async (req, res) => {
 // 3.login controller 
 const login = async (req, res) => {
     try {
+        const { email, password } = req.body;
 
+        if (!email || !password) {
+            return res.status(400).json({ ok: false, message: 'Both fields are required!' });
+        }
+        if (!emailValidator.validate(email)) {
+            return res.status(400).json({ ok: false, message: 'Invalid email format!' });
+        }
+        const user = await User.findOne({ email: email.toLowerCase() });
+        if (!user) {
+            return res.status(400).json({ ok: false, message: 'Invalid email or password!' });
+        }
+        if (!user.isVerified) {
+            return res.status(401).json({ ok: false, message: 'Please verify your email before logging in!' });
+        }
+        const isMatch = await bcrypt.compare(password, user.password);
+        if (!isMatch) {
+            return res.status(400).json({ ok: false, message: ' Invalid credential!' });
+        }
+
+        const token = jwt.sign(
+            { userId: user._id, email: user.email },
+            process.env.JWT_SECRET,
+            { expiresIn: '1d' }
+        );
+
+        res.status(200).json({
+            ok: true, message: 'Logged in successfully!', token,
+            user: {
+                id: user._id,
+                firstName: user.firstName,
+                lastName: user.lastName,
+                bio: user.bio,
+                email: user.email,
+                img: user.img,
+                address: user.address,
+                dob: user.dob,
+                phone: user.phone
+            }
+        });
     }
     catch (error) {
-
+        res.status(500).json({ error: error.message, message: 'Server Error' });
     }
 };
 
