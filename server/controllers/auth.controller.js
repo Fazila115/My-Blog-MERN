@@ -15,10 +15,14 @@ validator
 // 1. signup controller - register new user
 const signup = async (req, res) => {
     try {
-        const { firstName, lastName, email, password, bio, phone, dob, address, img } = req.body;
+        const { firstName, lastName, email, password, bio, phone, dob, address } = req.body;
+        const img = req.file?.path;
 
-        if (!firstName || !lastName || !email || !password || !bio || !phone || !dob || !address || !img) {
+        if (!firstName || !lastName || !email || !password || !bio || !phone || !dob || !address) {
             return res.status(400).json({ ok: false, message: 'All fields are required!' });
+        }
+        if (!img) {
+            return res.status(400).json({ ok: false, message: 'Image is required!' });
         }
         if (firstName.length < 3 || firstName.length > 20) {
             return res.status(400).json({ ok: false, message: 'First name must be between 3 and 20 characters long!' });
@@ -51,10 +55,6 @@ const signup = async (req, res) => {
         const phoneRegex = /^03[0-9]{9}$/;
         if (!phoneRegex.test(phone)) {
             return res.status(400).json({ ok: false, message: 'Phone number must be 11 digits and start with 03!' })
-        }
-        const imageRegex = /\.(jpg|jpeg|png|webp)$/i;
-        if (!imageRegex.test(img)) {
-            return res.status(400).json({ ok: false, message: 'Only jpg, jpeg, png, or webp images are allowed' })
         }
 
         const newUser = new User({
