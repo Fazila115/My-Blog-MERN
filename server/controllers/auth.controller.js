@@ -2,7 +2,7 @@ import User from '../models/user.model.js';
 import emailValidator from 'email-validator';
 import passwordValidator from 'password-validator';
 import emailTemplate from '../helper/emailTemplate.js';
-import { generateEmailtoken } from '../helper/generateToken.js';
+import { generateEmailToken } from '../helper/generateToken.js';
 import crypto from 'crypto';
 
 var validator = new passwordValidator();
@@ -60,7 +60,7 @@ const preSignup = async (req, res) => {
             return res.status(400).json({ ok: false, message: 'Phone number must be 11 digits and start with 03!' })
         }
 
-        const { token, hashedToken } = generateEmailtoken();
+        const { token, hashedToken } = generateEmailToken();
         const emailExpiry = Date.now() + 60 * 60 * 1000;
 
         const newUser = new User({
