@@ -1,7 +1,7 @@
 import crypto from 'crypto';
 
 const generateEmailtoken = () => {
-const token = crypto.randomBytes(32).toSorted('hex');
+const token = crypto.randomBytes(32).toString('hex');
 const hashedToken = crypto.createHash('sha256').update(token).digest('hex');
 
 return {token, hashedToken};

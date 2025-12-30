@@ -1,6 +1,9 @@
 import User from '../models/user.model.js';
 import emailValidator from 'email-validator';
 import passwordValidator from 'password-validator';
+import emailTemplate from '../helper/emailTemplate.js';
+import { generateEmailtoken } from '../helper/generateToken.js';
+import crypto from 'crypto';
 
 var validator = new passwordValidator();
 validator
@@ -12,8 +15,8 @@ validator
     .has().symbols()
     .has().not().spaces()
 
-// 1. signup controller - register new user
-const signup = async (req, res) => {
+// 1. pre-signup controller
+const preSignup = async (req, res) => {
     try {
         const { firstName, lastName, email, password, bio, phone, dob, address } = req.body;
         const img = req.file?.path;
@@ -57,27 +60,72 @@ const signup = async (req, res) => {
             return res.status(400).json({ ok: false, message: 'Phone number must be 11 digits and start with 03!' })
         }
 
+        const { token, hashedToken } = generateEmailtoken();
+        const emailExpiry = Date.now() + 60 * 60 * 1000;
+
         const newUser = new User({
-            firstName: firstName.trim(),
-            lastName: lastName.trim(),
-            email: email.trim(),
-            password,
-            bio: bio.trim(),
-            dob,
-            address: address.trim(),
+            firstName, 
+            lastName, 
+            email, 
+            password, 
+            bio, 
+            phone, 
+            dob, 
+            address, 
             img,
-            phone
+            emailVerifyToken: hashedToken,
+            emailVerifyExpiry: emailExpiry,
         });
+
         await newUser.save();
 
-        res.status(201).json({ ok: true, message: 'User Registered sucessfully!', user: newUser });
+        const verifyUrl = `${process.env.CLIENT_URL}/verify-email/${token}`;
+
+        await emailTemplate({
+            to: email,
+            subject: 'Verify Your Account',
+            html: `
+        <h4>Hello ${firstName},</h4>
+        <p>Thank you for signing up! Click below to verify your email:</p>
+        <a href="${verifyUrl}">Verify Email</a>
+        <p>This link expires in 1 hour.</p>
+      `
+        });
+
+        res.status(200).json({ ok: true, message: 'Verification email sent. Please check your inbox!' });
     }
     catch (error) {
         res.status(500).json({ error: error.message, message: 'Server Error' });
     }
 };
 
-// 2.login controller 
+// 2. signup controller - register new user
+const signup = async (req, res) => {
+    try {
+        const { token } = req.params;
+        const hashedToken = crypto.createHash("sha256").update(token).digest("hex");
+
+        const user = await User.findOne({
+            emailVerifyToken: hashedToken,
+            emailVerifyExpiry: { $gt: Date.now() },
+        });
+        if (!user) {
+            return res.status(400).json({ ok: false, message: "Invalid/Expired Token" });
+        }
+
+        user.isVerified = true;
+        user.emailVerifyToken = undefined;
+        user.emailVerifyExpiry = undefined;
+        await user.save();
+
+        return res.redirect(`${process.env.CLIENT_URL}/login`);
+    }
+    catch (error) {
+        res.status(500).json({ error: error.message, message: 'Server Error' });
+    }
+};
+
+// 3.login controller 
 const login = async (req, res) => {
     try {
 
@@ -87,4 +135,4 @@ const login = async (req, res) => {
     }
 };
 
-export { signup, login };
+export { preSignup, signup, login };
