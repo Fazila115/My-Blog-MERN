@@ -140,7 +140,28 @@ const deletePost = async (req, res) => {
 // 6. delete bulk posts by ids - POST
 const bulkDeletePosts = async (req, res) => {
     try {
+        const { ids } = req.body;
+        const userId = req.user?.id;
 
+        if (!ids || !Array.isArray(ids) || ids.length === 0) {
+            return res.status(400).json({ ok: false, message: "Array of post IDs is required", });
+        }
+        const validIds = ids.filter(id => mongoose.Types.ObjectId.isValid(id));
+        if (validIds.length === 0) {
+            return res.status(400).json({ ok: false, message: "No valid post IDs provided", });
+        }
+        const posts = await Post.find({ _id: { $in: validIds } });
+        if (posts.length === 0) {
+            return res.status(404).json({ ok: false, message: "No posts found for given IDs", });
+        }
+        let deletedCount = 0;
+        for (const post of posts) {
+            if (post.author.toString() !== userId) { continue; }
+            await Post.findByIdAndDelete(post._id);
+            deletedCount++;
+        }
+
+        return res.status(200).json({ ok: true, message: `${deletedCount} post(s) deleted successfully`, });
     }
     catch (error) {
         return res.status(500).json({ error: error.message, message: 'Server Error' });
