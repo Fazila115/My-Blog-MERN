@@ -1,3 +1,4 @@
+import mongoose from 'mongoose';
 import Post from '../models/post.model.js';
 
 // 1. get all posts - GET
@@ -40,10 +41,35 @@ const getSinglePost = async (req, res) => {
 // 3. add post - POST
 const addPost = async (req, res) => {
     try {
+        const { title, content } = req.body;
+        const author = req.user?.id;
+        const image = req.file?.path;
 
+        if (!title || !content || !image || !author) {
+            return res.status(400).json({ ok: false, message: "All fields are required!", });
+        }
+        if (title.trim().length < 3 || title.trim().length > 20) {
+            return res.status(400).json({ ok: false, message: "Title must be between 3 and 20 characters!", });
+        }
+        if (content.trim().length < 10 || content.trim().length > 1000) {
+            return res.status(400).json({ ok: false, message: "Content must be between 10 and 1000 characters!", });
+        }
+        if (!mongoose.Types.ObjectId.isValid(author)) {
+            return res.status(400).json({ ok: false, message: "Valid author ID is required!", });
+        }
+
+        const newPost = await Post.create({
+            title: title.trim(),
+            content: content.trim(),
+            author,
+            image,
+            likes: [],
+        });
+
+        return res.status(201).json({ ok: true, message: "Post added successfully!", post: newPost, });
     }
     catch (error) {
-        return res.status(500).json({ error: error.message, message: 'Server Error' });
+        return res.status(500).json({ error: error.message, message: "Server Error" });
     }
 };
 
