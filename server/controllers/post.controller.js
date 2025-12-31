@@ -31,7 +31,7 @@ const getSinglePost = async (req, res) => {
             return res.status(404).json({ ok: false, message: 'Post not found!' });
         }
 
-        res.status(200).json({ ok: true, message: 'Post fetched successfully!', post });
+        return res.status(200).json({ ok: true, message: 'Post fetched successfully!', post });
     }
     catch (error) {
         return res.status(500).json({ error: error.message, message: 'Server Error' });
@@ -76,10 +76,38 @@ const addPost = async (req, res) => {
 // 4. update/edit single post by id - PUT
 const editPost = async (req, res) => {
     try {
+        const { id } = req.params;
+        const { title, content } = req.body;
+        const image = req.file?.path;
+        const userId = req.user?.id;
 
-    }
-    catch (error) {
-        return res.status(500).json({ error: error.message, message: 'Server Error' });
+        if (!id || !mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(400).json({ ok: false, message: "Valid post ID is required!", });
+        }
+        const post = await Post.findById(id);
+        if (!post) {
+            return res.status(404).json({ ok: false, message: "Post not found!", });
+        }
+        if (post.author.toString() !== userId) {
+            return res.status(403).json({ ok: false, message: "You are not allowed to edit this post!", });
+        }
+        if (title && (title.trim().length < 3 || title.trim().length > 20)) {
+            return res.status(400).json({ ok: false, message: "Title must be between 3 and 20 characters!", });
+        }
+        if (content && (content.trim().length < 10 || content.trim().length > 1000)) {
+            return res.status(400).json({ ok: false, message: "Content must be between 10 and 1000 characters!", });
+        }
+
+        if (title) post.title = title.trim();
+        if (content) post.content = content.trim();
+        if (image) post.image = image;
+
+        await post.save();
+
+        return res.status(200).json({ ok: true, message: "Post updated successfully!", post, });
+
+    } catch (error) {
+        return res.status(500).json({ error: error.message, message: "Server Error" });
     }
 };
 
