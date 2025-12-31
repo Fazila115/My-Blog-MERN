@@ -114,7 +114,23 @@ const editPost = async (req, res) => {
 // 5. delete single post by id - DELETE
 const deletePost = async (req, res) => {
     try {
+        const { id } = req.params;
+        const userId = req.user?.id;
+        const post = await Post.findById(id);
 
+        if (!id || !mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(400).json({ ok: false, message: 'Valid Post ID is required!' });
+        }
+        if (!post) {
+            return res.status(404).json({ ok: false, message: 'Post not found!' });
+        }
+        if (post.author.toString() !== userId) {
+            return res.status(403).json({ ok: false, message: "You are not allowed to delete this post", });
+        }
+
+        await Post.findByIdAndDelete(id);
+
+        return res.status(200).json({ ok: true, message: 'Post deleted successfull!' });
     }
     catch (error) {
         return res.status(500).json({ error: error.message, message: 'Server Error' });
