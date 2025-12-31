@@ -6,10 +6,10 @@ const getAllPosts = async (req, res) => {
         const posts = await Post.find();
 
         if (posts.length === 0) {
-            return res.status(200).json({ ok:true, message: 'No posts found!',totalPosts: 0, posts: [] });
+            return res.status(200).json({ ok: true, message: 'No posts found!', totalPosts: 0, posts: [] });
         }
         else {
-            return res.status(200).json({ ok: true, message: `Total available posts: ${posts.length}`,totalPosts: posts.length, posts })
+            return res.status(200).json({ ok: true, message: `Total available posts: ${posts.length}`, totalPosts: posts.length, posts })
         }
     }
     catch (error) {
@@ -20,7 +20,17 @@ const getAllPosts = async (req, res) => {
 // 2. get single post by id - GET
 const getSinglePost = async (req, res) => {
     try {
+        const { id } = req.params.id;
+        const post = await Post.findById(id);
 
+        if (!id) {
+            return res.status(400).json({ ok: false, message: 'Post ID is required!!' });
+        }
+        if (!post) {
+            return res.status(404).json({ ok: false, message: 'Post not found!' });
+        }
+
+        res.status(200).json({ ok: true, message: 'Post fetched successfully!', post });
     }
     catch (error) {
         return res.status(500).json({ error: error.message, message: 'Server Error' });
