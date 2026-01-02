@@ -1,9 +1,10 @@
 import Post from '../models/post.model.js'
+import Comment from '../models/comment.model.js';
 
 const overviewPlatform = async (req, res) => {
     try {
         const totalPosts = await Post.countDocuments();
-        const totalComments = await Post.countDocuments();
+        const totalComments = await Comment.countDocuments();
 
         return res.status(200).json({
             ok: true,
