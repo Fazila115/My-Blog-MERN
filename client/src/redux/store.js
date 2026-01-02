@@ -6,5 +6,5 @@ const reducer = combineReducers({
     auth: auth,
     post: post
 });
-
-export default store = configureStore({reducer});
+const store = configureStore({reducer});
+export default store;
