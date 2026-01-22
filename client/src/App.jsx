@@ -6,13 +6,14 @@ const Signup = lazy(() => import('./screens/auth/Signup.jsx'));
 const About = lazy(() => import('./screens/localPages/About.jsx'));
 const AllPosts = lazy(() => import('./screens/localPages/AllPosts.jsx'));
 const Contact = lazy(() => import('./screens/localPages/Contact.jsx'));
-const LandingPage = lazy(() => import('./screens/localPages/LandingPage.jsx'));
 const SinglePost = lazy(() => import('./screens/localPages/SinglePost.jsx'));
 const AddPost = lazy(() => import('./screens/user/AddPost.jsx'));
 const Dashboard = lazy(() => import('./screens/user/Dashboard.jsx'));
 const Posts = lazy(() => import('./screens/user/Posts.jsx'));
 const Profile = lazy(() => import('./screens/user/Profile.jsx'));
 const EditPost = lazy(() => import('./screens/user/EditPost.jsx'));
+
+import LandingPage from './screens/localPages/LandingPage.jsx';
 import PageNotFound from './screens/localPages/PageNotFound.jsx';
 
 const App = () => {
