@@ -15,13 +15,14 @@ const EditPost = lazy(() => import('./screens/user/EditPost.jsx'));
 
 import LandingPage from './screens/localPages/LandingPage.jsx';
 import PageNotFound from './screens/localPages/PageNotFound.jsx';
+import AppLoader from './components/local/AppLoader.jsx';
 
 const App = () => {
   return (
     <Router>
       <ToastContainer />
 
-      <Suspense>
+      <Suspense fallback={<AppLoader/>}>
         <Routes>
           {/* local pages */}
           <Route path='/' element={<LandingPage />} />
