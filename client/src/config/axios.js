@@ -18,7 +18,7 @@ const getParsedValue = (key) => {
 // request interceptor
 axiosInstance.interceptors.request.use(
     (config) => {
-        const user = localStorage.getItem('user');
+        const user = getParsedValue('user');
         const token = user?.token;
         if(token){config.headers.Authorization = `Bearer ${token}`}
         return config;
