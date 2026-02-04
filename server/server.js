@@ -12,7 +12,7 @@ const PORT = process.env.PORT || 3000;
 
 // connect database
 dotenv.config();
-connectDB();
+await connectDB();
 
 // middlewares
 app.use(express.json());
