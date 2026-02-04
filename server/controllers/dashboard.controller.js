@@ -1,20 +1,21 @@
-import Post from '../models/post.model.js'
-import Comment from '../models/comment.model.js';
+import * as dashboardService from '../services/dashboard.service.js';
 
+// GET - Platform Overview
 const overviewPlatform = async (req, res) => {
     try {
-        const totalPosts = await Post.countDocuments();
-        const totalComments = await Comment.countDocuments();
+        const data = await dashboardService.overviewPlatformService();
 
         return res.status(200).json({
             ok: true,
             message: 'Get overview successfully!',
-            totalComments: totalComments,
-            totalPosts: totalPosts
-        })
-    }
-    catch (error) {
-        return res.status(500).json({ error: error.message, message: 'Server Error' });
+            ...data
+        });
+
+    } catch (error) {
+        return res.status(500).json({
+            ok: false,
+            message: error.message
+        });
     }
 };
 
