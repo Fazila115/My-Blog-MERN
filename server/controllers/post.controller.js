@@ -1,171 +1,81 @@
-import mongoose from 'mongoose';
-import Post from '../models/post.model.js';
+import * as postService from '../services/post.service.js';
 
-// 1. get all posts - GET
-const getAllPosts = async (req, res) => {
+// 1. Get all posts
+export const getAllPosts = async (req, res) => {
     try {
-        const posts = await Post.find();
-
-        if (posts.length === 0) {
-            return res.status(200).json({ ok: true, message: 'No posts found!', totalPosts: 0, posts: [] });
-        }
-        else {
-            return res.status(200).json({ ok: true, message: `Total available posts: ${posts.length}`, totalPosts: posts.length, posts })
-        }
-    }
-    catch (error) {
-        return res.status(500).json({ error: error.message, message: 'Server Error' });
-    }
-};
-
-// 2. get single post by id - GET
-const getSinglePost = async (req, res) => {
-    try {
-        const { id } = req.params.id;
-        const post = await Post.findById(id);
-
-        if (!id) {
-            return res.status(400).json({ ok: false, message: 'Post ID is required!!' });
-        }
-        if (!post) {
-            return res.status(404).json({ ok: false, message: 'Post not found!' });
-        }
-
-        return res.status(200).json({ ok: true, message: 'Post fetched successfully!', post });
-    }
-    catch (error) {
-        return res.status(500).json({ error: error.message, message: 'Server Error' });
-    }
-};
-
-// 3. add post - POST
-const addPost = async (req, res) => {
-    try {
-        const { title, content } = req.body;
-        const author = req.user?.id;
-        const image = req.file?.path;
-
-        if (!title || !content || !image || !author) {
-            return res.status(400).json({ ok: false, message: "All fields are required!", });
-        }
-        if (title.trim().length < 3 || title.trim().length > 20) {
-            return res.status(400).json({ ok: false, message: "Title must be between 3 and 20 characters!", });
-        }
-        if (content.trim().length < 10 || content.trim().length > 1000) {
-            return res.status(400).json({ ok: false, message: "Content must be between 10 and 1000 characters!", });
-        }
-        if (!mongoose.Types.ObjectId.isValid(author)) {
-            return res.status(400).json({ ok: false, message: "Valid author ID is required!", });
-        }
-
-        const newPost = await Post.create({
-            title: title.trim(),
-            content: content.trim(),
-            author,
-            image,
-            likes: [],
+        const posts = await postService.getAllPostsService();
+        res.status(200).json({
+            ok: true,
+            totalPosts: posts.length,
+            posts
         });
-
-        return res.status(201).json({ ok: true, message: "Post added successfully!", post: newPost, });
-    }
-    catch (error) {
-        return res.status(500).json({ error: error.message, message: "Server Error" });
-    }
-};
-
-// 4. update/edit single post by id - PUT
-const editPost = async (req, res) => {
-    try {
-        const { id } = req.params;
-        const { title, content } = req.body;
-        const image = req.file?.path;
-        const userId = req.user?.id;
-
-        if (!id || !mongoose.Types.ObjectId.isValid(id)) {
-            return res.status(400).json({ ok: false, message: "Valid post ID is required!", });
-        }
-        const post = await Post.findById(id);
-        if (!post) {
-            return res.status(404).json({ ok: false, message: "Post not found!", });
-        }
-        if (post.author.toString() !== userId) {
-            return res.status(403).json({ ok: false, message: "You are not allowed to edit this post!", });
-        }
-        if (title && (title.trim().length < 3 || title.trim().length > 20)) {
-            return res.status(400).json({ ok: false, message: "Title must be between 3 and 20 characters!", });
-        }
-        if (content && (content.trim().length < 10 || content.trim().length > 1000)) {
-            return res.status(400).json({ ok: false, message: "Content must be between 10 and 1000 characters!", });
-        }
-
-        if (title) post.title = title.trim();
-        if (content) post.content = content.trim();
-        if (image) post.image = image;
-
-        await post.save();
-
-        return res.status(200).json({ ok: true, message: "Post updated successfully!", post, });
-
     } catch (error) {
-        return res.status(500).json({ error: error.message, message: "Server Error" });
+        res.status(500).json({ ok: false, message: error.message });
     }
 };
 
-// 5. delete single post by id - DELETE
-const deletePost = async (req, res) => {
+// 2. Get single post
+export const getSinglePost = async (req, res) => {
     try {
-        const { id } = req.params;
-        const userId = req.user?.id;
-        const post = await Post.findById(id);
-
-        if (!id || !mongoose.Types.ObjectId.isValid(id)) {
-            return res.status(400).json({ ok: false, message: 'Valid Post ID is required!' });
-        }
-        if (!post) {
-            return res.status(404).json({ ok: false, message: 'Post not found!' });
-        }
-        if (post.author.toString() !== userId) {
-            return res.status(403).json({ ok: false, message: "You are not allowed to delete this post", });
-        }
-
-        await Post.findByIdAndDelete(id);
-
-        return res.status(200).json({ ok: true, message: 'Post deleted successfull!' });
-    }
-    catch (error) {
-        return res.status(500).json({ error: error.message, message: 'Server Error' });
+        const post = await postService.getSinglePostService(req.params.id);
+        res.status(200).json({ ok: true, post });
+    } catch (error) {
+        res.status(400).json({ ok: false, message: error.message });
     }
 };
 
-// 6. delete bulk posts by ids - POST
-const bulkDeletePosts = async (req, res) => {
+// 3. Add post
+export const addPost = async (req, res) => {
     try {
-        const { ids } = req.body;
-        const userId = req.user?.id;
+        const post = await postService.addPostService(
+            { ...req.body, image: req.file?.path },
+            req.user?.id
+        );
 
-        if (!ids || !Array.isArray(ids) || ids.length === 0) {
-            return res.status(400).json({ ok: false, message: "Array of post IDs is required", });
-        }
-        const validIds = ids.filter(id => mongoose.Types.ObjectId.isValid(id));
-        if (validIds.length === 0) {
-            return res.status(400).json({ ok: false, message: "No valid post IDs provided", });
-        }
-        const posts = await Post.find({ _id: { $in: validIds } });
-        if (posts.length === 0) {
-            return res.status(404).json({ ok: false, message: "No posts found for given IDs", });
-        }
-        let deletedCount = 0;
-        for (const post of posts) {
-            if (post.author.toString() !== userId) { continue; }
-            await Post.findByIdAndDelete(post._id);
-            deletedCount++;
-        }
-
-        return res.status(200).json({ ok: true, message: `${deletedCount} post(s) deleted successfully`, });
-    }
-    catch (error) {
-        return res.status(500).json({ error: error.message, message: 'Server Error' });
+        res.status(201).json({ ok: true, post });
+    } catch (error) {
+        res.status(400).json({ ok: false, message: error.message });
     }
 };
 
-export { getAllPosts, getSinglePost, editPost, deletePost, bulkDeletePosts, addPost };
+// 4. Edit post
+export const editPost = async (req, res) => {
+    try {
+        const post = await postService.editPostService(
+            req.params.id,
+            { ...req.body, image: req.file?.path },
+            req.user?.id
+        );
+
+        res.status(200).json({ ok: true, post });
+    } catch (error) {
+        res.status(400).json({ ok: false, message: error.message });
+    }
+};
+
+// 5. Delete post
+export const deletePost = async (req, res) => {
+    try {
+        await postService.deletePostService(req.params.id, req.user?.id);
+        res.status(200).json({ ok: true, message: "Post deleted successfully" });
+    } catch (error) {
+        res.status(400).json({ ok: false, message: error.message });
+    }
+};
+
+// 6. Bulk delete
+export const bulkDeletePosts = async (req, res) => {
+    try {
+        const deletedCount = await postService.bulkDeletePostsService(
+            req.body.ids,
+            req.user?.id
+        );
+
+        res.status(200).json({
+            ok: true,
+            message: `${deletedCount} post(s) deleted`
+        });
+    } catch (error) {
+        res.status(400).json({ ok: false, message: error.message });
+    }
+};
