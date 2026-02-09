@@ -1,70 +1,81 @@
-import Post from '../models/post.model.js';
+import * as postService from '../service/post.service.js';
 
-// 1. get all posts - GET
-const getAllPosts = async (req, res) => {
+// 1. Get all posts
+export const getAllPosts = async (req, res) => {
     try {
-        const posts = await Post.find();
-
-        if (posts.length === 0) {
-            return res.status(200).json({ ok:true, message: 'No posts found!',totalPosts: 0, posts: [] });
-        }
-        else {
-            return res.status(200).json({ ok: true, message: `Total available posts: ${posts.length}`,totalPosts: posts.length, posts })
-        }
-    }
-    catch (error) {
-        return res.status(500).json({ error: error.message, message: 'Server Error' });
+        const posts = await postService.getAllPostsService();
+        res.status(200).json({
+            ok: true,
+            totalPosts: posts.length,
+            posts
+        });
+    } catch (error) {
+        res.status(500).json({ ok: false, message: error.message });
     }
 };
 
-// 2. get single post by id - GET
-const getSinglePost = async (req, res) => {
+// 2. Get single post
+export const getSinglePost = async (req, res) => {
     try {
-
-    }
-    catch (error) {
-        return res.status(500).json({ error: error.message, message: 'Server Error' });
+        const post = await postService.getSinglePostService(req.params.id);
+        res.status(200).json({ ok: true, post });
+    } catch (error) {
+        res.status(400).json({ ok: false, message: error.message });
     }
 };
 
-// 3. add post - POST
-const addPost = async (req, res) => {
+// 3. Add post
+export const addPost = async (req, res) => {
     try {
+        const post = await postService.addPostService(
+            { ...req.body, image: req.file?.path },
+            req.user?.id
+        );
 
-    }
-    catch (error) {
-        return res.status(500).json({ error: error.message, message: 'Server Error' });
+        res.status(201).json({ ok: true, post });
+    } catch (error) {
+        res.status(400).json({ ok: false, message: error.message });
     }
 };
 
-// 4. update/edit single post by id - PUT
-const editPost = async (req, res) => {
+// 4. Edit post
+export const editPost = async (req, res) => {
     try {
+        const post = await postService.editPostService(
+            req.params.id,
+            { ...req.body, image: req.file?.path },
+            req.user?.id
+        );
 
-    }
-    catch (error) {
-        return res.status(500).json({ error: error.message, message: 'Server Error' });
+        res.status(200).json({ ok: true, post });
+    } catch (error) {
+        res.status(400).json({ ok: false, message: error.message });
     }
 };
 
-// 5. delete single post by id - DELETE
-const deletePost = async (req, res) => {
+// 5. Delete post
+export const deletePost = async (req, res) => {
     try {
-
-    }
-    catch (error) {
-        return res.status(500).json({ error: error.message, message: 'Server Error' });
+        await postService.deletePostService(req.params.id, req.user?.id);
+        res.status(200).json({ ok: true, message: "Post deleted successfully" });
+    } catch (error) {
+        res.status(400).json({ ok: false, message: error.message });
     }
 };
 
-// 6. delete bulk posts by ids - POST
-const bulkDeletePosts = async (req, res) => {
+// 6. Bulk delete
+export const bulkDeletePosts = async (req, res) => {
     try {
+        const deletedCount = await postService.bulkDeletePostsService(
+            req.body.ids,
+            req.user?.id
+        );
 
-    }
-    catch (error) {
-        return res.status(500).json({ error: error.message, message: 'Server Error' });
+        res.status(200).json({
+            ok: true,
+            message: `${deletedCount} post(s) deleted`
+        });
+    } catch (error) {
+        res.status(400).json({ ok: false, message: error.message });
     }
 };
-
-export { getAllPosts, getSinglePost, editPost, deletePost, bulkDeletePosts, addPost };

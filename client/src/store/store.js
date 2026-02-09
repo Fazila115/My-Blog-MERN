@@ -1,10 +1,10 @@
 import { combineReducers, configureStore } from '@reduxjs/toolkit';
-import auth from './slices/authSlice.js';
-import post from './slices/postSlice.js';
+import auth from './authSlice.js';
+import post from './postSlice.js';
 
 const reducer = combineReducers({
     auth: auth,
     post: post
 });
-
-export default store = configureStore({reducer});
+const store = configureStore({reducer});
+export default store;
