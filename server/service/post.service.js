@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import { findAllPosts, findPostById, createPost, savePost, deletePostById, findPostsByIds } from '../repository/post.repository.js';
+import { findAllPosts, findPostById, createPost, savePost, deletePostById, findPostsByIds } from '../repository/postRepository.js';
 
 // 1. Get all posts
 export const getAllPostsService = async () => {

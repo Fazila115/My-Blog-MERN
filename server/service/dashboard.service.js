@@ -1,4 +1,4 @@
-import { countTotalPosts, countTotalComments } from '../repository/dashboard.repository.js';
+import { countTotalPosts, countTotalComments } from '../repository/dashboardRepository.js';
 
 // Get platform overview statistics
 export const overviewPlatformService = async () => {

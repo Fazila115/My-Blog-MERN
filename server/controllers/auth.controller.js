@@ -1,4 +1,4 @@
-import * as authService from '../services/auth.service.js';
+import * as authService from '../service/auth.service.js';
 
 //1. Pre-signup
 export const preSignup = async (req, res) => {

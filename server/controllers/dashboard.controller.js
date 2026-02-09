@@ -1,4 +1,4 @@
-import * as dashboardService from '../services/dashboard.service.js';
+import * as dashboardService from '../service/dashboard.service.js';
 
 // GET - Platform Overview
 const overviewPlatform = async (req, res) => {
