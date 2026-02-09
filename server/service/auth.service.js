@@ -51,11 +51,12 @@ export const preSignupService = async (userData) => {
 
     await createUser(userData);
 
-    const verifyUrl = `${process.env.CLIENT_URL}/verify-email/${token}`;
+    const verifyUrl = `${process.env.CLIENT_URL}/signup/${token}`;
     await emailTemplate({
         to: email,
         subject: 'Verify Your Account',
-        html: `<h4>Hello ${firstName}</h4><p>Click below to verify:</p><a href="${verifyUrl}">Verify Email</a>`
+        html: `<h4>Hello ${firstName}</h4><p>Click below to verify:</p><br/>
+        <a href="${verifyUrl}">Verify Email</a>`
     });
 
     return true;

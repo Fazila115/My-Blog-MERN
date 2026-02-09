@@ -31,7 +31,7 @@ const App = () => {
           <Route path='/all-posts' element={<AllPosts />} />
           <Route path='/single-post/:id' element={<SinglePost />} />
           <Route path='/login' element={<Login />} />
-          <Route path='/signup' element={<Signup />} />
+          <Route path='/signup/:token' element={<Signup />} />
 
           {/* user protected pages */}
           <Route path='/user/posts/add' element={<AddPost />} />
