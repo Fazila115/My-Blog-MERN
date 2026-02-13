@@ -5,35 +5,37 @@ import { EditOutlined, UserOutlined } from "@ant-design/icons";
 const ProfileAvatar = () => {
     const [imageUrl, setImageUrl] = useState(null);
 
-    const handleChange = (info) => {
+    const handleFileChange = (file) => {
         const reader = new FileReader();
-        reader.addEventListener("load", () => setImageUrl(reader.result));
-        reader.readAsDataURL(info.file);
-        return false; // prevent upload to server
+        reader.onload = () => setImageUrl(reader.result);
+        reader.readAsDataURL(file);
     };
 
     return (
-        <div style={{ position: "relative", display: "inline-block" }}>
-            {/* Avatar */}
-            <Avatar
-                size={100}
-                src={imageUrl}
-                icon={!imageUrl && <UserOutlined />}
-            />
+        <Upload
+            showUploadList={false}
+            accept="image/*"
+            customRequest={({ file, onSuccess }) => {
+                handleFileChange(file);
+                onSuccess("ok"); // prevent upload to server
+            }}
+        >
+            <div style={{ position: "relative", display: "inline-block", cursor: "pointer" }}>
+                {/* Avatar */}
+                <Avatar
+                    size={100}
+                    src={imageUrl}
+                    icon={!imageUrl && <UserOutlined />}
+                />
 
-            {/* Edit Icon */}
-            <Upload
-                showUploadList={false}
-                beforeUpload={handleChange}
-                style={{ position: "absolute", bottom: 0, right: 0 }}
-            >
-                <Tooltip title="upload">
-                    <div style={{ position: "absolute", bottom: 0, right: 0, backgroundColor: "#fff", borderRadius: "50%", padding: 4, border: "1px solid #d9d9d9", cursor: "pointer", }} >
+                {/* Edit Icon */}
+                <Tooltip title="Upload">
+                    <div style={{ position: "absolute", bottom: 0, right: 0, backgroundColor: "#fff", borderRadius: "20%", padding: 4, cursor: "pointer", }} >
                         <EditOutlined />
                     </div>
                 </Tooltip>
-            </Upload>
-        </div>
+            </div>
+        </Upload>
     );
 };
 

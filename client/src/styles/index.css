@@ -1,3 +1,7 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.signupInput {
+    @apply rounded-full hover:border-amber-600 focus:border-amber-600 p-2 w-full
+}
