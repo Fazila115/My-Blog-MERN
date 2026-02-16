@@ -12,10 +12,12 @@ const Dashboard = lazy(() => import('./screens/user/Dashboard.jsx'));
 const Posts = lazy(() => import('./screens/user/Posts.jsx'));
 const Profile = lazy(() => import('./screens/user/Profile.jsx'));
 const EditPost = lazy(() => import('./screens/user/EditPost.jsx'));
+const PrivacyPolicy = lazy(() => import('./screens/localPages/PrivacyPolicy.jsx'));
 
 import LandingPage from './screens/localPages/LandingPage.jsx';
 import PageNotFound from './screens/localPages/PageNotFound.jsx';
 import AppLoader from './components/local/AppLoader.jsx';
+import OTP from './screens/auth/OTPpage.jsx';
 
 const App = () => {
   return (
@@ -31,7 +33,9 @@ const App = () => {
           <Route path='/all-posts' element={<AllPosts />} />
           <Route path='/single-post/:id' element={<SinglePost />} />
           <Route path='/login' element={<Login />} />
-          <Route path='/signup/:token' element={<Signup />} />
+          <Route path='/signup' element={<Signup />} />
+          <Route path='/privacy-policy' element={<PrivacyPolicy/>}/>
+          <Route path='/otp' element={<OTP/>}/>
 
           {/* user protected pages */}
           <Route path='/user/posts/add' element={<AddPost />} />
