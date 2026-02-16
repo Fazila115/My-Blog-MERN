@@ -16,6 +16,7 @@ const EditPost = lazy(() => import('./screens/user/EditPost.jsx'));
 import LandingPage from './screens/localPages/LandingPage.jsx';
 import PageNotFound from './screens/localPages/PageNotFound.jsx';
 import AppLoader from './components/local/AppLoader.jsx';
+import PrivacyPolicy from './screens/localPages/PrivacyPolicy.jsx';
 
 const App = () => {
   return (
@@ -32,6 +33,7 @@ const App = () => {
           <Route path='/single-post/:id' element={<SinglePost />} />
           <Route path='/login' element={<Login />} />
           <Route path='/signup' element={<Signup />} />
+          <Route path='/privacy-policy' element={<PrivacyPolicy/>}/>
 
           {/* user protected pages */}
           <Route path='/user/posts/add' element={<AddPost />} />

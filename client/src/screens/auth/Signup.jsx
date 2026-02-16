@@ -2,6 +2,7 @@ import React from 'react'
 import background from '../../images/register.webp';
 import { Button, Checkbox, Form, Input } from 'antd';
 import ProfileAvatar from '../../components/local/Avatar';
+import logo from '../../images/logo.webp';
 
 const Signup = () => {
   return (
@@ -10,12 +11,12 @@ const Signup = () => {
         {/* left box */}
         <div className="w-1/2 h-full p-4">
           <h1 className='text-[#9C6B5C] font-bold text-3xl text-center'>Register</h1>
-          <a>Logo</a>
+          <a><img src={logo} alt="logo"  className='w-30 h-10'/></a>
 
-          <Form className='bg-white m-6 p-4'>
+          <Form className=' p-2'>
             <div className="text-center">  <ProfileAvatar /></div>
 
-            <div className="flex items-center gap-3 mt-2">
+            <div className="flex items-center gap-3 mt-4">
               {/* first name */}
               <Form.Item className='w-1/2'>
                 <Input placeholder='First Name' className='signupInput' />
@@ -51,11 +52,17 @@ const Signup = () => {
 
             {/* checkbox */}
             <Form.Item>
-              <Checkbox className='signupInput'>By checking the box, you agree to our privacy policy. </Checkbox>
+                <Checkbox className="signupInput " />
+                <span className="text-sm ml-2">
+                  By checking this box and proceeding with registration, I acknowledge that I have read, understood, and agree to be bound by the
+                  <a href='/privacy-policy' className='text-[#D97654] hover:text-[#D97650]'> Privacy Policy.</a>
+                </span>
             </Form.Item>
 
             {/* submit button */}
-            <Button>Register</Button>
+            <Button size='large' className='btn'>Register</Button>
+
+            <p className='text-center mt-8'>Already have an account? <a href='/login' className='text-[#D97654] hover:text-[#D97650]'>Login</a></p>
           </Form>
         </div>
 

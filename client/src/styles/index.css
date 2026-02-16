@@ -2,6 +2,49 @@
 @tailwind components;
 @tailwind utilities;
 
-.signupInput {
-    @apply rounded-full hover:border-amber-600 focus:border-amber-600 p-2 w-full
+.signupInput .ant-input, .signupInput.ant-input {
+  border-radius: 9999px !important;
+  padding: 8px !important;
+}
+
+.signupInput .ant-input:focus, .signupInput.ant-input:focus, .signupInput .ant-input-focused, .signupInput.ant-input-affix-wrapper-focused {
+  border-color: #D97654 !important;
+}
+
+.signupInput.ant-input-affix-wrapper {
+  border-radius: 9999px !important;
+}
+
+.signupInput .ant-input:hover, .signupInput.ant-input:hover, .signupInput.ant-input-affix-wrapper:hover {
+  border-color: #D97654 !important;
+}
+
+.btn {
+  border-radius: 9999px !important;
+  background-color: #E88966 !important;
+  border-color: #E88966 !important;
+  color: white !important;
+  display: block;
+  width: 100%;
+  font-weight: 600;
+}
+
+.btn:hover, .btn:focus {
+  background-color: #D97654 !important;
+  border-color: #D97654 !important;
+  color: white !important;
+}
+
+.ant-checkbox-checked .ant-checkbox-inner {
+  background-color: #E88966 !important;
+  border-color: #E88966 !important;
+}
+
+.ant-checkbox-wrapper:hover .ant-checkbox-inner, .ant-checkbox:hover .ant-checkbox-inner {
+  border-color: #D97654 !important;
+}
+
+.signupCheckbox .ant-checkbox-inner {
+  margin-top: 0 !important;
+  vertical-align: middle !important;
 }

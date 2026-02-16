@@ -30,7 +30,7 @@ const ProfileAvatar = () => {
 
                 {/* Edit Icon */}
                 <Tooltip title="Upload">
-                    <div style={{ position: "absolute", bottom: 0, right: 0, backgroundColor: "#fff", borderRadius: "20%", padding: 4, cursor: "pointer", }} >
+                    <div style={{ position: "absolute", bottom: 0, right: 0, backgroundColor: "#F3EAEA", borderRadius: "20%", padding: 4, cursor: "pointer", }} >
                         <EditOutlined />
                     </div>
                 </Tooltip>
